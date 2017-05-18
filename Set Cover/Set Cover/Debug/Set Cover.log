@@ -1,0 +1,13 @@
+﻿  Source.cpp
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(32): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(36): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(62): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(66): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(86): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(115): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(116): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(148): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(154): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(166): warning C4101: 'totalCost': unreferenced local variable
+  Set Cover.vcxproj -> c:\users\anzor\documents\visual studio 2015\Projects\Set Cover\Debug\Set Cover.exe
+  Set Cover.vcxproj -> c:\users\anzor\documents\visual studio 2015\Projects\Set Cover\Debug\Set Cover.pdb (Partial PDB)
