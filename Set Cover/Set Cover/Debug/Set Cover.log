@@ -1,17 +1,23 @@
 ﻿  Source.cpp
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(107): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(111): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(137): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(141): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(160): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(188): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(189): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(253): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(273): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(278): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(287): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(309): warning C4018: '<': signed/unsigned mismatch
-c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(325): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(121): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(125): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(138): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(152): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(166): warning C4018: '>': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(177): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(205): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(206): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(257): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(259): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(265): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(283): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(284): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(332): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(352): warning C4018: '<': signed/unsigned mismatch
 c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(357): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(366): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(388): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(404): warning C4018: '<': signed/unsigned mismatch
+c:\users\anzor\documents\visual studio 2015\projects\set cover\set cover\source.cpp(436): warning C4018: '<': signed/unsigned mismatch
   Set Cover.vcxproj -> C:\Users\Anzor\documents\visual studio 2015\Projects\Set Cover\Debug\Set Cover.exe
   Set Cover.vcxproj -> C:\Users\Anzor\documents\visual studio 2015\Projects\Set Cover\Debug\Set Cover.pdb (Partial PDB)

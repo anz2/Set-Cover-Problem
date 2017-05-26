@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define ERROR_MESSAGE "Something Wrong With Initial Data!!!"
+#define ERROR_MESSAGE "Something Wrong With Initial Data!!!\n"
 typedef vector<vector<int> > vvi;
 typedef vector<int> vi;
 typedef vector<pair<int, int>> vpii;
@@ -54,7 +54,9 @@ vi vertices, edges, optimalVertices, vertexCost, necessaryVertices;
 				[-1] - i<=j 
 				[-2] - გაურკვევლობა!
 [reduceDominativeEdges]-დომინანტური სტრიქონების ამოყრა და მათი წაშლა vertices ვექტორიდან
-[printData]-მონაცემების დაბეჭდვა 
+[printData]-მონაცემების დაბეჭდვა ეკრანზე 
+[printFilteredData]-გაფილტრული მონაცემების ბეჭდვა ეკრანზე
+[printComparisons]-სტრიქონების დომინანტურობაზე შედარებების ბეჭდვა.
 [filterData]-საწყისი მონაცემების გაფილტვრა ორი ფუნქციის მეშვეობით,რომელთაგან ერთი 
 			დომინანტურ სტრიქონებს აქრობს და მეორე კიდე აუცილებელ სიმრავლეებს იღებს.
 [swapEdges]-მოცემულ მატრიცაში სტრიქონების გაცვლას აკეთებს. იყენებს ბიტურ ოპერაციებს.
@@ -78,11 +80,24 @@ int totalCoveringVertexNumber(int edge) {
 	return answer;
 }
 void InsertionSortForDominantEdges() {
+	vi memo;
+	memo.resize(M);
+	for (int edge = 0; edge < M; edge++) {
+		memo[edge] = totalCoveringVertexNumber(edge);
+	}
 	for (int edge = 0; edge < M-1; edge++) {
+		int maxIndex = edge;
 		for (int nextEdge = edge+1; nextEdge < M; nextEdge++) {
-			if (totalCoveringVertexNumber(edge) < totalCoveringVertexNumber(nextEdge)) {
-				swapEdges(edge, nextEdge);
+			if (memo[maxIndex] < memo[nextEdge]) {
+				maxIndex = nextEdge;
 			}
+		}
+		if (maxIndex != edge) {
+			swapEdges(edge, maxIndex);
+			memo[edge] = memo[edge] ^ memo[maxIndex];
+			memo[maxIndex] = memo[edge] ^ memo[maxIndex];
+			memo[edge] = memo[edge] ^ memo[maxIndex];
+
 		}
 	}
 }
@@ -90,51 +105,48 @@ void initialiseData(string filename) {
 	ifstream filestream_input(filename);
 	filestream_input >> M >> N;
 	T.resize(M);
-	for (int i = 0; i < M; i++) {
-		T[i].resize(N);
-		for (int j = 0; j < N; j++) {
-			filestream_input >> T[i][j];
+	for (int edge = 0; edge < M; edge++) {
+		T[edge].resize(N);
+		for (int vertex = 0; vertex < N; vertex++) {
+			filestream_input >> T[edge][vertex];
 		}
 	}
 	InsertionSortForDominantEdges();
 	vertexCost.resize(N);
-	for (int i = 0; i < N; i++) {
-		filestream_input >> vertexCost[i];
+	for (int currentVertexCost = 0; currentVertexCost < N; currentVertexCost++) {
+		filestream_input >> vertexCost[currentVertexCost];
 	}
 	optimalCost = INT_MAX;
 	//put this code to sort algorithm
 	vertices.resize(N);
-	for (int i = 0; i < vertices.size(); i++) {
-		vertices[i] = i;
+	for (int vertex = 0; vertex < vertices.size(); vertex++) {
+		vertices[vertex] = vertex;
 	}
 	edges.resize(M);
-	for (int i = 0; i < edges.size(); i++) {
-		edges[i] = i;
+	for (int edge = 0; edge < edges.size(); edge++) {
+		edges[edge] = edge;
 	}
 
 	foundSolution = false;
 }
 bool possibleToCoverAllEdges(){
-	int sum;
-	for (int i = 0; i < M; i++) {
-		sum = 0;
-		for (int j = 0; j < N; j++){
-			sum += T[i][j];
-		}
-		if (sum == 0){
-			return false;
-		}
+	if (totalCoveringVertexNumber(M - 1) == 0) {
+		return false;
 	}
 	return true;
 }
 void reduce(int i, int j){
-	edges.erase(edges.begin() + i);
+	for (int edgeIndex = 0; edgeIndex < edges.size(); edgeIndex++) {
+		if (T[edges[edgeIndex]][j]) {
+			edges.erase(edges.begin() + edgeIndex);
+		}
+	}
 	vertices.erase(vertices.begin() + j);
 }
 void findNecessaryVertices() {
 	int index;
 	bool found;
-	for (int i = 0; i < edges.size(); i++) {
+	for (int i = edges.size()-1; i >= 0; i--) {
 		found = true;
 		index = -1;
 		int j = 0;
@@ -145,13 +157,19 @@ void findNecessaryVertices() {
 					break;
 				}
 				else {
-					index = vertices[j];
+					index = j;
 				}
 			}
 		}
 		if (found) {
 			necessaryVertices.push_back(index);
-			reduce(edges[i], vertices[j]);
+			reduce(edges[i], index);
+			if (i > edges.size()) {
+				i = edges.size();
+			}
+		}
+		else {
+			return;
 		}
 	}
 }
@@ -193,7 +211,7 @@ void reduceDominativeEdges() {
 			}
 			if (k >= 0) {
 				edges.erase(edges.begin() + i);
-				i--;
+				break;
 			}
 			else {
 				edges.erase(edges.begin() + j);
@@ -202,19 +220,83 @@ void reduceDominativeEdges() {
 		}
 	}
 }
-void printData(string filename) {
-	ofstream Filestream_output(filename);
+void printData() {
+	if (M == 0 && N == 0) {
+		printf("\nNo Data!!\n");
+		return;
+	}
+	printf("\n=====================================================================\n");
+	printf("Printing Full Data...\n");
+
 	printf("Number of Edges: %d\tNumber of Vertices: %d\n", M, N);
 	for (int edge = 0; edge < M; edge++) {
-		for (int vertex = 0; vertex < N; vertex++) {
-			
+		printf("%d", T[edge][0]);
+		for (int vertex = 1; vertex < N; vertex++) {
+			printf(" %d", T[edge][vertex]);
 		}
+		printf("\n");
 	}
-} //not fully implemented!!!!
+	printf("\nCost Of Vertices:\n%d",vertexCost[0]);
+	for (int vertex = 1; vertex < N; vertex++) {
+		printf(" %d", vertexCost[vertex]);
+	}
+	printf("\n");
+	printf("=====================================================================\n");
+}
+void printFilteredData() {
+	if (M == 0 || N == 0) {
+		printf("\nNo Data!!\n");
+		return;
+	}
+	if (edges.size() == 0 || vertices.size() == 0) {
+		printf("\nNo Data left after Filtering!!\n");
+		return;
+	}
+	printf("\n=====================================================================\n");
+	printf("Printing Filtered Data...\n");
+	printf("Number of Edges Left: %d\tNumber of Vertices Left: %d\n", edges.size(), vertices.size());
+	for (int edgeIndex = 0; edgeIndex < edges.size(); edgeIndex++) {
+		printf("%d", T[edges[edgeIndex]][0]);
+		for (int vertexIndex = 1; vertexIndex < vertices.size(); vertexIndex++) {
+			printf(" %d", T[edges[edgeIndex]][vertices[vertexIndex]]);
+		}
+		printf("\n");
+	}
+	printf("\nCost Of Left Vertices:\n%d", vertexCost[vertices[0]]);
+	for (int vertexIndex = 1; vertexIndex < vertices.size(); vertexIndex++) {
+		printf(" %d", vertexCost[vertices[vertexIndex]]);
+	}
+	printf("\n");
+	printf("=====================================================================\n");
+}
 void filterData() {
 	findNecessaryVertices();
 	reduceDominativeEdges();
 	printf("Data Filtering is Done!\n");
+}
+void printComparisons() {
+	if (edges.size() < 2) {
+		printf("\nComparison List is Empty!\n");
+		return;
+	}
+	printf("\n=====================================================================\n");
+	printf("Printing Comparisons...\n");
+	for (int i = 0; i < edges.size() - 1; i++) {
+		for (int j = i + 1; j < edges.size(); j++) {
+			int k = compareEdges(edges[i], edges[j]);
+			if (k == -2) {
+				printf("edge[%d] !! edge[%d]\n", edges[i], edges[j]);
+				continue;
+			}
+			if (k >=0) {
+				printf("edge[%d] >= edge[%d]\n", edges[i], edges[j]);
+			}
+			else {
+				printf("edge[%d] < edge[%d]\n", edges[i], edges[j]);
+			}
+		}
+	}
+	printf("=====================================================================\n");
 }
 /*
 ================================================================================================
@@ -366,23 +448,30 @@ void printResults() {
 }
 
 int main() {
-	string filename;
+	string filename="Text.txt";
 	printf("input filename: \n");
-	cin >> filename;
+	//cin >> filename;
 	initialiseData(filename);
 	if (!possibleToCoverAllEdges()) {
 		printf(ERROR_MESSAGE);
 		system("pause");
 		return 0;
 	}
-	//filter given data to be proceed next
+	printData();
+	printComparisons();
 	filterData();
+	printFilteredData();
+	printComparisons();
 
-	//Problem Solution With Set Cover Algorithm 
-	AlgorithmInitialiser();
+	
 
-	//Print results:
-	printResults();
+
+
+
+
+	//AlgorithmInitialiser();
+
+	//printResults();
 
 	system("Pause");
 	return 0;
