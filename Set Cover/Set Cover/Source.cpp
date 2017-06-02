@@ -511,8 +511,6 @@ void printResults() {
 	}
 }
 
-
-
 int main() {
 	string filename="Text.txt"; 
 	string pattern;
