@@ -23,9 +23,13 @@ typedef pair<int, int> pii;
 [T]-შემავალი მატრიცა რომელიც არის (MxN)განზუმილების და თუ T[i][j]==1 ეს ნიშნავს რომ
 	i-ურ ელემენტს j-ური სიმრავლე ფარავს
 [blocks]-ბლოკები რომლებიც აიგება უკვე გაფილტრული მონაცემებიდან. i-ურ ბლოკში არის 
-		 მოთავსებული ის სიმრავლეები რომლებიც ფარავენ [i:M] ელემენტებს მხოლოდ
-[vertices]-აქ ვინახავთ საბოლოო დამფარავი სიმრავლეების სიას რომელიც ალგორითმს გადაეცემა
-[edges]- აქ ვინახავთ საბოლოო ელემენტების სიას რომელიც ალგორითმს გადაეცემა
+		 მოთავსებული ის სიმრავლეები რომლებიც ფარავენ მხოლოდ i-ურ ელემენტებს  და
+		 [i+1:M] ელემენტებიდან ნებისმიერს. 
+[vertices]-აქ ვინახავთ საბოლოო გაფილტვრის შემდგომ დარჩენილ დამფარავ სიმრავლეების
+			სიას რომელთაგან ყოველივე გადაეცემა ალგორითმს განსახილველად
+[edges]- იგივენაირად ვინახავთ ელემენტებს როგორც დამფარავ სიმრავლეებს
+[A] - ეს არის მატრიცა რომელიც შეიცავს გაფილტვრის შემდგომ დარჩენილ ელემენტებს და 
+		მათ დამფარავ სიმრავლეებს. იგი არის (edges.size() x vertices.size()) განზუმილების
 [optimalVertices]-ოპტიმალური დამფარავი სიმრავლეების სია,რომელიც დააბრუნა ალგორითმმა 
 [vertexCost]-მოცემული სიმრავლეების წონები
 [necessaryVertices]-საჭირო სიმრავლეები, რომლებიც აუცილებლად უნდა შევიდნენ ამონახსნში
@@ -33,11 +37,15 @@ typedef pair<int, int> pii;
 */
 bool foundSolution; 
 int M, N, optimalCost;
-vvi T, blocks;
+vvi T, blocks,A;
 vi vertices, edges, optimalVertices, vertexCost, necessaryVertices;
 /*
 ===============================================================================================
 მონაცემების წინასწარი ფილტრაციისთვის საჭირო ფუნქციების ჩამონათვალი:
+[swapEdges]-მოცემულ მატრიცაში სტრიქონების გაცვლას აკეთებს. იყენებს ბიტურ ოპერაციებს.
+[totalCoveringVertexNumber]-ითვლის მოცემულ სტრიქონში 1-იანების რაოდენობას
+[InsertionSortForDominantEdges]-დალაგების ალგორითმი, რომელიც სტრიქონებს ალაგებს მათში
+								1-იანების რაოდენობის კლების მიხედვით.
 [initialiseData]-მონაცემების ინიციალიზაცია, შეტანა და საწყის მდგომარეობაში მოყვანა
 [possibleToCoverAllEdges]-ამოწმებს შეიძლება თუ არა ყველა ელემენტის დაფარვა, მოცემული
 						  სიმრავლეებით. აბრუნებს False თუ ეს შეუძლებელია.
@@ -56,13 +64,9 @@ vi vertices, edges, optimalVertices, vertexCost, necessaryVertices;
 [reduceDominativeEdges]-დომინანტური სტრიქონების ამოყრა და მათი წაშლა vertices ვექტორიდან
 [printData]-მონაცემების დაბეჭდვა ეკრანზე 
 [printFilteredData]-გაფილტრული მონაცემების ბეჭდვა ეკრანზე
-[printComparisons]-სტრიქონების დომინანტურობაზე შედარებების ბეჭდვა.
 [filterData]-საწყისი მონაცემების გაფილტვრა ორი ფუნქციის მეშვეობით,რომელთაგან ერთი 
 			დომინანტურ სტრიქონებს აქრობს და მეორე კიდე აუცილებელ სიმრავლეებს იღებს.
-[swapEdges]-მოცემულ მატრიცაში სტრიქონების გაცვლას აკეთებს. იყენებს ბიტურ ოპერაციებს.
-[totalCoveringVertexNumber]-ითვლის მოცემულ სტრიქონში 1-იანების რაოდენობას
-[InsertionSortForDominantEdges]-დალაგების ალგორითმი, რომელიც სტრიქონებს ალაგებს მათში 
-								1-იანების რაოდენობის კლების მიხედვით.
+[printComparisons]-სტრიქონების დომინანტურობაზე შედარებების ბეჭდვა.
 ================================================================================================
 */
 void swapEdges(int i, int j) {
@@ -101,21 +105,46 @@ void InsertionSortForDominantEdges() {
 		}
 	}
 }
-void initialiseData(string filename) {
+void initialiseData(string filename,string pattern) {
 	ifstream filestream_input(filename);
-	filestream_input >> M >> N;
-	T.resize(M);
-	for (int edge = 0; edge < M; edge++) {
-		T[edge].resize(N);
-		for (int vertex = 0; vertex < N; vertex++) {
-			filestream_input >> T[edge][vertex];
+	if (pattern == "") {
+		filestream_input >> M >> N;
+		T.resize(M);
+		for (int edge = 0; edge < M; edge++) {
+			T[edge].resize(N);
+			for (int vertex = 0; vertex < N; vertex++) {
+				filestream_input >> T[edge][vertex];
+			}
 		}
+		InsertionSortForDominantEdges();
+		vertexCost.resize(N);
+		for (int currentVertexCost = 0; currentVertexCost < N; currentVertexCost++) {
+			filestream_input >> vertexCost[currentVertexCost];
+		}
+	}
+	/*
+	else {
+	char* dest = new char[filename.length() + 1];
+	copy(filename.begin(), filename.end(), dest);
+	freopen(dest, "r", stdin);
+	scanf_s("%d %d\n", &M, &N);
+	T.resize(M);
+	int u, v;
+	for (int edge = 0; edge < M; edge++) {
+	T[edge].resize(N);
+	scanf_s("UndirectedEdge[%d,%d]\n", &u, &v);
+	T[edge][u - 1] = T[edge][v - 1] = 1;
 	}
 	InsertionSortForDominantEdges();
 	vertexCost.resize(N);
 	for (int currentVertexCost = 0; currentVertexCost < N; currentVertexCost++) {
-		filestream_input >> vertexCost[currentVertexCost];
+	scanf_s("%d", &vertexCost[currentVertexCost]);
 	}
+	scanf_s("\n");
+	fclose(stdin);
+
+	}
+	*/
 	optimalCost = INT_MAX;
 	//put this code to sort algorithm
 	vertices.resize(N);
@@ -301,23 +330,24 @@ void printComparisons() {
 /*
 ================================================================================================
 უმცირესი დაფარვის ალგორითმისთვის საჭირო ფუნქციების ჩამონათვალი:
+[BuildNewData] - ქმნის ძველი მონაცემებიდან გაფილტვრის შედეგების დახმარებით ახალ მონაცემებს
+[printBuiltData] - ბეჭდავს გაფილტრულ მონაცემების შესახებ ინფორმაციას. ეს მონაცემები
+					გადაეცემა ალგორითმს რომელიც ეძებს ოპტიმალურ ამონახსნს
 [searchForCoveringVertexes]-ფუნქცია ეძებს მოცემული სტრიქონისთვის ყველა შესაძლო დამფარავ
 							სიმრავლეებს და ყრის შესაბამის ბლოკში წონის ზრდის მიხედვით
 [buildBlocks]-აკეთებს ბლოკებს იმ ზომისას რამდენი ელემენტის დაფარვაც არის საჭირო უკვე
 				ფილტრაციის შემდგომ. შეიძლება ბლოკის ზომა არის M-ის ტოლი მცირე. თითოეულ
 				ბლოკში კი არის შენახული შესაბამისი ელემენტის დამფარავი სიმრავლეები.
-[findNotCoveredEdge]-ნახულობს რომელი სიმრავლე არ არის დაფარული ალგორითმის მუშაობისას.
+[findNextBlockIndexByNotCoveredEdge]-ნახულობს რომელი სიმრავლე არ არის დაფარული ალგორითმის მუშაობისას.
+									და აბრუნებს შესაბამისი ბლოკის ნომერს
 [intersection]- ნახულობს საერთო დაფარული ელემენტების  რაოდენობას მოცემული 
 				სიმრავლისა და დაფარული ელემენტების სიმრავლეს შორის. იგივე თანაკვეთა.
 [findBlockNumber]- გვეუბნება მოცემული სიმრავლე რომელ ბლოკში უნდა შევიდეს. ანუ რომელი
 					არის უმცირესი ინდექსის ელემენტი რომლის დაფარვაც შეუძლია ამ სიმრავლეს.
 [addEdges]-დაფარული ელემენტების სიაში ამატებს იმ ახალ ელემენტებს რომლებსაც ფარავს სიმრავლე
-[allEdgesCovered]-ფუნქცია აბრუნებს True-ს თუ ყველა სასურველი ელემენტი იქნა დაფარული
-[addNecessaryVertexesAndUpdateCost]-საბოლოო პასუხში ვამატებთ იმ სიმრავლეებს რომლებიც გვქონდა
+[sumUpResultedData]-საბოლოო პასუხში ვამატებთ იმ სიმრავლეებს რომლებიც გვქონდა
 									ცალკე გადადებული მათი აუცილებლობის გამო necessaryVertices 
 									სიაში და პასუხში ვამატებთ მათ საერთო ღირებულებასაც.
-[AlgorithmInitialiser]-ალგორითმის გამშვები ფუნქცია რომელიც იძახებს უმცირესი დამფარავი 
-						სიმრავლის რეკურსიულ ალგორითმს საწყისი მონაცემებით.
 [SetCoverAlgorithm]-უმცირესი დაფარვის ალგორითმი, რომელიც არის "ძებნა უკან დაბრუნებით" 
 					პრინციპზე აგებული. იგი ყოველი ბლოკისთვის იტერაციულად გადაუყვება შემდეგ
 					სიმრავლეებს და გადადის სიღრმეში. განიხილავს ყველა ვარიანტს და შედეგად 
@@ -325,99 +355,132 @@ void printComparisons() {
 					b=O(M) - ბლოკების რაოდენობა და k=(მაქსიმალური ბლოკის ზომა)=O(N). 
 					მიუხედავად ამისა ალგორითმი იმუშავებს რეალურ მონაცემებზე ბევრად სწრაფად 
 					რადგან იგი აკეთებს ხის გაჩეხვას და რეკურსია ბოლომდე აღარ ჩადის სიღრმეში.
+[AlgorithmInitialiser]-ალგორითმის გამშვები ფუნქცია რომელიც იძახებს უმცირესი დამფარავი
+					   სიმრავლის რეკურსიულ ალგორითმს საწყისი მონაცემებით.
+[printResults] - ალგორითმის შედეგების ბეჭდვა.
 ================================================================================================
 */
+void BuildNewData() {
+	A.resize(edges.size());
+	for (int edge = 0; edge < A.size(); edge++) {
+		A[edge].resize(vertices.size());
+		for (int vertex = 0; vertex < A[edge].size(); vertex++) {
+			A[edge][vertex] = T[edges[edge]][vertices[vertex]];
+		}
+	}
+}
+void printBuiltData() {
+	if (A.size() == 0 || A[0].size() == 0) {
+		printf("\nNo Data has been built!!\n");
+		return;
+	}
+	printf("\n=====================================================================\n");
+	printf("Printing Built Data...\n");
+
+	printf("Number of Edges: %d\tNumber of Vertices: %d\n", A.size(), A[0].size());
+	for (int edge = 0; edge < A.size(); edge++) {
+		printf("%d", A[edge][0]);
+		for (int vertex = 1; vertex < A[0].size(); vertex++) {
+			printf(" %d", A[edge][vertex]);
+		}
+		printf("\n");
+	}
+	printf("\nCost Of Vertices:\n%d", vertexCost[vertices[0]]);
+	for (int vertex = 1; vertex < A[0].size(); vertex++) {
+		printf(" %d", vertexCost[vertices[vertex]]);
+	}
+	printf("\n");
+	printf("=====================================================================\n");
+}
 void searchForCoveringVertexes(int edge) {
 	vpii listToBeSorted;
 	pii temp;
-	for (int vertexIndex = 0; vertexIndex < vertices.size() && T[edge][vertices[vertexIndex]]==1; vertexIndex++) {
-		int sum = 0;
-		for (int j = 0; j < edge; j++) {
-			sum += T[j][vertices[vertexIndex]];
-		}
-		if (sum == 0) {
-			temp.first = vertices[vertexIndex];
-			temp.second = vertexCost[temp.first];
-			listToBeSorted.push_back(temp);
+	for (int vertex = 0; vertex < A[0].size(); vertex++) {
+		if (A[edge][vertex] == 1) {
+			int sum = 0;
+			for (int j = 0; j < edge; j++) {
+				sum += A[j][vertex];
+			}
+			if (sum == 0) {
+				temp.first = vertex;
+				temp.second = vertexCost[vertices[vertex]];
+				listToBeSorted.push_back(temp);
+			}
 		}
 	}
 	sort(listToBeSorted.begin(), listToBeSorted.end(), [](pii a, pii b) {return a.second < b.second; });
 	for each (pii couple in listToBeSorted) {
 		blocks[edge].push_back(couple.first);
 	}
-	delete &listToBeSorted;
-	delete &temp;
 }
 void buildBlocks() {
-	blocks.resize(M);
+	blocks.resize(A.size());
 	for (int blockNumber = 0; blockNumber < blocks.size(); blockNumber++) {
 		searchForCoveringVertexes(blockNumber);
 	}
 }
-int findNotCoveredEdge(const vi &coveredEdgesList) {
-	for (int i = 0; i < coveredEdgesList.size(); i++) {
-		if (coveredEdgesList[i] == 0)
-			return i;
+int findNextBlockIndexByNotCoveredEdge(const vi &coveredEdgesList) {
+	for (int edge = 0; edge < coveredEdgesList.size(); edge++) {
+		if (coveredEdgesList[edge] == 0) {
+			return edge;
+		}
 	}
 	return -1;
 }
 int intersection(int vertex, const vi &coveredEdgesList) {
 	int counter = 0;
-	int edge;
-	for (int edgeIndex = 0; edgeIndex < edges.size(); edgeIndex++) {
-		edge = edges[edgeIndex];
-		if (T[edge][vertex] == 1 && coveredEdgesList[edge] == 1)
+	for (int edge = 0; edge < A.size(); edge++) {
+		if (A[edge][vertex] == 1 && coveredEdgesList[edge] == 1)
 			counter++;
 	}
 	return counter;
 }
 int findBlockNumber(int vertex) {
-	for (int edge = 0; edge < M; edge++) {
-		if (T[edge][vertex] == 1) {
+	for (int edge = 0; edge < A.size(); edge++) {
+		if (A[edge][vertex] == 1) {
 			return edge;
 		}
 	}
 	return -1;
 }
 void addEdges(int vertex, vi &coveredEdgesList) {
-	for (int edge = 0; edge < M; edge++) {
-		if(T[edge][vertex]==1)
+	for (int edge= 0; edge < A.size(); edge++) {
+		if(A[edge][vertex]==1)
 			coveredEdgesList[edge] = 1;
 	}
 }
-bool allEdgesCovered(vi &coveredEdgesList) {
-	for (int i = 0; i < coveredEdgesList.size(); i++) {
-		if (coveredEdgesList[i] == 0)
-			return false;
+void sumUpResultedData() {
+	for (int vertexIndex = 0; vertexIndex < optimalVertices.size(); vertexIndex++) {
+		optimalVertices[vertexIndex] = vertices[optimalVertices[vertexIndex]];
+	}	
+	for each (int necessaryVertex in necessaryVertices) {
+		optimalVertices.push_back(necessaryVertex);
+		optimalCost += vertexCost[necessaryVertex];
 	}
-	return true;
+	sort(optimalVertices.begin(), optimalVertices.end());
 }
-void addNecessaryVertexes() {
-	
-}
-void SetCoverAlgorithm(int  blockIndex, vi vertexList, vi coveredEdgesList, int totalCost) {
-	if (allEdgesCovered(coveredEdgesList)) {
+void SetCoverAlgorithm(vi vertexList, vi coveredEdgesList, int totalCost) {
+	int blockIndex = findNextBlockIndexByNotCoveredEdge(coveredEdgesList);
+	if (blockIndex==-1) {
 		optimalCost = totalCost;
 		optimalVertices = vertexList;
+		foundSolution = true;
 		return;
 	}
 	else {
 		for (int vertexIndexInBlock = 0; vertexIndexInBlock < blocks[blockIndex].size(); vertexIndexInBlock++) {
 			int actualVertex = blocks[blockIndex][vertexIndexInBlock];
-			if (vertexCost[actualVertex] + totalCost >= optimalCost) {
+			if (vertexCost[vertices[actualVertex]] + totalCost >= optimalCost) {
 				return;
 			}
 			else {
 				vi temporaryVertexList = vertexList;
 				int temporaryTotalCost = totalCost;
 				vi temporaryCoveredEdgesList = coveredEdgesList;
-				int blockToBeConsideredNext;
-			    temporaryVertexList[actualVertex]=1;
+			    temporaryVertexList.push_back(actualVertex);//changed from [v]=1 to push_back(v)!!
 				addEdges(actualVertex, temporaryCoveredEdgesList);
-				temporaryTotalCost += vertexCost[actualVertex];
-				//find index of block which will be considered next and call recursion
-				blockToBeConsideredNext = findNotCoveredEdge(coveredEdgesList);
-				SetCoverAlgorithm(blockToBeConsideredNext, temporaryVertexList, temporaryCoveredEdgesList, temporaryTotalCost);
+				temporaryTotalCost += vertexCost[vertices[actualVertex]];
+				SetCoverAlgorithm(temporaryVertexList, temporaryCoveredEdgesList, temporaryTotalCost);
 			}
 		}
 	}
@@ -425,53 +488,51 @@ void SetCoverAlgorithm(int  blockIndex, vi vertexList, vi coveredEdgesList, int 
 }
 void AlgorithmInitialiser() {
 	vi vertexList, coveredEdgesList;
-	coveredEdgesList.resize(M);
 	int totalCost = 0;
+	BuildNewData();
 	buildBlocks();
-	int startingBlockNumber = findNotCoveredEdge(coveredEdgesList);
-	SetCoverAlgorithm(startingBlockNumber, vertexList, coveredEdgesList, totalCost);
+	coveredEdgesList.resize(A.size());
+	SetCoverAlgorithm(vertexList, coveredEdgesList, totalCost);
 }
 void printResults() {
 	if (foundSolution) {
+		sumUpResultedData();
+		printf("\n=====================================================================\n");
+		printf("Printing Results...\n");
 		printf("List Of Optimal Vertices: \n{");
-		for (int vertexIndex = 0; vertexIndex < optimalVertices.size(); vertexIndex++) {
-			if (optimalVertices[vertexIndex] == 1)
-				printf("%d ", vertexIndex + 1);
+		for each (int vertex in optimalVertices) {
+			printf("%d ", vertex + 1);
 		}
 		printf("}\n");
-		printf("Optimal Total Cost: %d",optimalCost);
+		printf("Optimal Total Cost: %d\n\n", optimalCost);
 	}
-	//but I think we will find a solution!!
 	else {
-		printf("Solution Not Found!!\nTry Correction of Data!!");
+		printf("\nSolution Not Found!!\nTry Correction of Data!!\n\n");
 	}
 }
 
+
+
 int main() {
-	string filename="Text.txt";
+	string filename="Text.txt"; 
+	string pattern;
 	printf("input filename: \n");
 	//cin >> filename;
-	initialiseData(filename);
+	initialiseData(filename,pattern);
 	if (!possibleToCoverAllEdges()) {
 		printf(ERROR_MESSAGE);
 		system("pause");
 		return 0;
 	}
-	printData();
-	printComparisons();
+	//printData();
+	//printComparisons();
 	filterData();
-	printFilteredData();
-	printComparisons();
+	//printFilteredData();
+	//printComparisons();
 
-	
-
-
-
-
-
-	//AlgorithmInitialiser();
-
-	//printResults();
+	AlgorithmInitialiser();
+	//printBuiltData();
+	printResults();
 
 	system("Pause");
 	return 0;
